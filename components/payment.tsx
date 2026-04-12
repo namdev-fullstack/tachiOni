@@ -18,12 +18,12 @@ import { Button } from "@/components/ui/button";
 import { QrCode, CreditCard, Wallet, Copy, Loader2, AlertTriangle } from "lucide-react";
 
 import TopUpCard from "./topUpCard";
-import { useAuth } from "@/context/AuthContext";
-import { formatPrice } from "@/lib/utils";
+
+
 import Link from "next/link";
 
 export default function Payment({ data }: { data: any }) {
-    const { user } = useAuth();
+
     const accountNumber = "0711000316522";
     const [copied, setCopied] = useState(false);
 
@@ -48,7 +48,7 @@ export default function Payment({ data }: { data: any }) {
                     Mua Ngay (Liên Hệ - Để Cọc)
                 </Button>
             </AlertDialogTrigger>
-{user && user ?(
+
                        <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
 
                 <AlertDialogHeader>
@@ -147,8 +147,8 @@ export default function Payment({ data }: { data: any }) {
                     </AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
-):(
-    <AlertDialogContent className="max-w-lg">
+
+    {/* <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
             <AlertDialogTitle>Nạp tiền</AlertDialogTitle>
             <AlertDialogDescription className="text-green-500 font-bold text-lg">Đăng nhập hoặc Đăng ký để nạp tiền</AlertDialogDescription>
@@ -160,8 +160,8 @@ export default function Payment({ data }: { data: any }) {
                 </Button>
             </AlertDialogCancel>
         </AlertDialogFooter>
-    </AlertDialogContent>
-)}
+    </AlertDialogContent> */}
+
         </AlertDialog>
     );
 }
