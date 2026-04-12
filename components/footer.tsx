@@ -58,7 +58,7 @@ export default function Footer() {
         <h3 className="text-lg font-semibold mb-4">Liên Hệ</h3>
         <div className="space-y-2 text-gray-400">
           <p>📧 support@gamephobian.com</p>
-          <p>📞 0563 275 607</p>
+          <p>📞 0966 216 495</p>
           <p>🕒 Hỗ trợ 24/7</p>
           <p>🏢 Hà Nội, Việt Nam</p>
         </div>

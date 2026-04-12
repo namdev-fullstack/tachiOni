@@ -4,6 +4,7 @@ import { useState } from "react";
 import { db } from "@/lib/firebaseConfig";
 import { addDoc, collection } from "firebase/firestore";
 import { generateCode } from "@/lib/utils";
+import { toast } from "sonner";
 
 // 👉 ENV
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUD_NAME!;
@@ -91,40 +92,74 @@ export default function CreateProductForm() {
   };
 
   // 👉 submit
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  // ❌ VALIDATE
+  if (
+    !form.rank ||
+    form.price <= 0 ||
+    form.fake_price <= 0 ||
+    form.heroes_count <= 0 ||
+    form.skins_count <= 0 ||
+    !form.category_id ||
+    files.length === 0
+  ) {
+    toast.error("Thiếu thông tin ⚠️", {
+      description: "Nhập đầy đủ + chọn ảnh giúp t 😏",
+    });
+    return;
+  }
 
-      // upload ảnh
-      const imageUrls = await Promise.all(
-        files.map((file) => uploadImage(file))
-      );
+  try {
+    setLoading(true);
 
-      // lưu firebase
-      await addDoc(collection(db, "accounts"), {
-        ...form,
-        images: imageUrls,
-        category: categoryMap[
-          form.category_id as keyof typeof categoryMap
-        ],
-        quantity: 1,
-        created_at: new Date(),
-      });
+    const imageUrls = await Promise.all(
+      files.map((file) => uploadImage(file))
+    );
 
-      alert("Đăng thành công 🚀");
+    await addDoc(collection(db, "accounts"), {
+      ...form,
+      images: imageUrls,
+      category: categoryMap[
+        form.category_id as keyof typeof categoryMap
+      ],
+      quantity: 1,
+      created_at: new Date(),
+    });
 
-      // reset form
-      setPreview([]);
-      setFiles([]);
-    } catch (err) {
-      console.log(err);
-      alert("Lỗi upload");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ SUCCESS
+    toast.success("Đăng thành công 🚀", {
+      description: "Acc đã lên kệ, chuẩn bị bán thôi 🔥",
+    });
+
+    // reset
+    setPreview([]);
+    setFiles([]);
+    setForm({
+      code: generateCode(),
+      rank: "Đồng",
+      heroes_count: 0,
+      skins_count: 0,
+      price: 0,
+      fake_price: 0,
+      is_sale: false,
+      is_active: true,
+      highlight: "",
+      category_id: "vip",
+    });
+
+  } catch (err) {
+    console.log(err);
+
+    // ❌ ERROR
+    toast.error("Lỗi upload ❌", {
+      description: "Check lại mạng hoặc Cloudinary",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form
@@ -153,6 +188,7 @@ export default function CreateProductForm() {
         <input
           type="number"
           name="heroes_count"
+          value={form.heroes_count}
           placeholder="Số tướng"
           onChange={handleChange}
           className="border p-3 rounded"
@@ -160,6 +196,7 @@ export default function CreateProductForm() {
         <input
           type="number"
           name="skins_count"
+          value={form.skins_count}
           placeholder="Số skin"
           onChange={handleChange}
           className="border p-3 rounded"
@@ -171,6 +208,7 @@ export default function CreateProductForm() {
         <input
           type="number"
           name="price"
+          value={form.price}
           placeholder="Giá thật"
           onChange={handleChange}
           className="border p-3 rounded"
@@ -178,6 +216,7 @@ export default function CreateProductForm() {
         <input
           type="number"
           name="fake_price"
+          value={form.fake_price}
           placeholder="Giá fake"
           onChange={handleChange}
           className="border p-3 rounded"
@@ -187,6 +226,7 @@ export default function CreateProductForm() {
       {/* CATEGORY */}
       <select
         name="category_id"
+        value={form.category_id}
         onChange={handleChange}
         className="w-full border p-3 rounded"
       >
@@ -198,6 +238,7 @@ export default function CreateProductForm() {
       {/* HIGHLIGHT */}
       <input
         name="highlight"
+        value={form.highlight}
         placeholder="Highlight (Hot, VIP...)"
         onChange={handleChange}
         className="w-full border p-3 rounded"

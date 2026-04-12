@@ -11,12 +11,12 @@ import MaintenancePage from '@/components/MaintenancePage';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Game Phổ Biến - Mua Bán Tài Khoản Game Uy Tín #1 Việt Nam',
+  title: 'Mua Bán Tài Khoản Game Uy Tín #1 Việt Nam',
   description: 'Nền tảng mua bán tài khoản game hàng đầu Việt Nam...',
   icons: {
-    icon: "/avatar2-removebg-preview.png", // favicon chính
-    shortcut: "/avatar2-removebg-preview.png",
-    apple: "/apple-touch-icon.png", // cho iOS
+    icon: "/avatar2-removebg.PNG", // favicon chính
+    shortcut: "/avatar2-removebg.PNG",
+    apple: "/avatar2-removebg.PNG", // cho iOS
   },
   // phần metadata khác của bạn giữ nguyên
 };

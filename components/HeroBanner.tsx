@@ -90,8 +90,8 @@ export default function HeroBanner() {
           </Link>
 
           <Link
-            href="https://zalo.me/0563275607"
-            target="_blank"
+            href="/contact"
+           
             className="px-6 py-3 sm:px-8 sm:py-3 rounded-xl 
               border border-blue-400 text-blue-200 font-semibold 
               hover:bg-blue-600/20 hover:border-blue-300 transition text-sm sm:text-base flex items-center justify-center gap-2"
