@@ -9,7 +9,7 @@ export default function HeroBanner() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="/banner.jpg" // 👉 ảnh nền bạn thay bằng ảnh thật (ví dụ trong /public)
+          src="/banner.jpeg" // 👉 ảnh nền bạn thay bằng ảnh thật (ví dụ trong /public)
           alt="Liên Quân Background"
           fill
           
@@ -55,16 +55,7 @@ export default function HeroBanner() {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center text-center">
         {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <Image
-            width={150}
-            height={150}
-            src="/logoLienQuan.png"
-            alt="Liên Quân"
-            quality={100}
-            className="drop-shadow-2xl animate-bounce-slow hover:scale-110 transition-transform duration-300"
-          />
-        </div>
+     
 
         {/* Title */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight [text-shadow:_0_0_10px_rgb(37_99_235_/_0.8),_0_0_20px_rgb(59_130_246_/_0.6)]">

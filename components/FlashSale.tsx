@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 import { addPrice, formatPrice, getDeposit } from "@/lib/utils";
+import ProductDialog from "./ProductDialog";
 
 type Account = {
   id: string;
@@ -84,14 +85,33 @@ export default function FlashSale() {
   return (
     <div className="relative">
       {/* Nút trái */}
-      <button className="flash-prev absolute -left-8 top-1/2 -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full hover:scale-110 transition">
-        <ChevronLeft />
-      </button>
+     {/* Nút trái */}
+<button
+  className="
+    flash-prev 
+    absolute left-2 md:-left-6 
+    top-1/2 -translate-y-1/2 z-10 
+    bg-white/90 backdrop-blur shadow-md 
+    p-2 md:p-3 rounded-full 
+    hover:scale-110 active:scale-95 transition
+  "
+>
+  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+</button>
 
-      {/* Nút phải */}
-      <button className="flash-next absolute -right-8 top-1/2 -translate-y-1/2 z-10 bg-white shadow p-2 rounded-full hover:scale-110 transition">
-        <ChevronRight />
-      </button>
+{/* Nút phải */}
+<button
+  className="
+    flash-next 
+    absolute right-2 md:-right-6 
+    top-1/2 -translate-y-1/2 z-10 
+    bg-white/90 backdrop-blur shadow-md 
+    p-2 md:p-3 rounded-full 
+    hover:scale-110 active:scale-95 transition
+  "
+>
+  <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+</button>
 
       <Swiper
         modules={[Navigation, Autoplay]}
@@ -122,13 +142,15 @@ export default function FlashSale() {
               <CardContent className="p-0">
                 {/* IMAGE */}
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <Image
-                    src={acc.images?.[0] || "/acc.jpg"}
-                    alt={acc.code}
-                    width={400}
-                    height={200}
-                    className="w-full h-32 sm:h-40 object-cover group-hover:scale-110 group-hover:-rotate-1 transition-transform duration-700"
-                  />
+                 <Image
+                                     src={acc.images?.[0] || "/acc.jpg"}
+                                     alt={acc.code}
+                                     width={400}
+                                     height={400}
+                                     quality={100}
+                                     className="w-full h-32 sm:h-56 object-cover object-top 
+                   group-hover:scale-110 group-hover:-rotate-1 transition-transform duration-700"
+                                   />
 
                   <Badge className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] border-0 animate-pulse shadow-md">
                     Sale
@@ -154,28 +176,18 @@ export default function FlashSale() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-                    <div className="flex items-center space-x-2 bg-blue-50 px-1.5 py-1 rounded-md shadow-sm">
-                      <Users className="w-3 h-3 text-blue-500" />
-                      <span className="text-[11px] font-bold">
-                        {acc.heroes_count} Tướng
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-1 bg-pink-50 px-1.5 py-1 rounded-md shadow-sm">
-                      <Star className="w-3 h-3 text-pink-500" />
-                      <span className="text-[11px] font-bold">
-                        {acc.skins_count} Skin
-                      </span>
-                    </div>
-                  </div>
-
+                  
                   <div className="mb-3">
                     <div className="flex items-center space-x-1 mb-1">
                       <span className="md:text-lg text-xs font-bold text-red-500">
                         {formatPrice(
                           Number(acc.price) +
                             addPrice(Number(acc.price))
+                        )}
+                      </span>
+                      <span className="md:text-lg text-xs line-through text-gray-400">
+                        {formatPrice(
+                          Number(acc.fake_price)
                         )}
                       </span>
                     </div>
@@ -218,40 +230,8 @@ export default function FlashSale() {
       </Swiper>
 
       {/* DIALOG GIỮ NGUYÊN */}
-      <Dialog
-        open={!!selectedProduct}
-        onOpenChange={() => setSelectedProduct(null)}
-      >
-        <DialogContent className="max-w-3xl p-0 overflow-hidden">
-          {selectedProduct && (
-            <div>
-              <Image
-                src={selectedProduct.images?.[0] || "/acc.jpg"}
-                alt={selectedProduct.code}
-                width={800}
-                height={500}
-                className="w-full h-[400px] object-cover hover:scale-110 transition"
-              />
-
-              <div className="p-5 space-y-4">
-                <h2 className="text-lg font-bold">
-                  Mã: {selectedProduct.code}
-                </h2>
-
-                <p>Rank: {selectedProduct.rank}</p>
-
-                <p>
-                  Giá:{" "}
-                  {formatPrice(
-                    Number(selectedProduct.price) +
-                      addPrice(Number(selectedProduct.price))
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <ProductDialog selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
+      
     </div>
   );
 }

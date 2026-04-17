@@ -27,14 +27,49 @@ const ranks = [
   "Reset",
 ];
 
+// 👉 format tiền VNĐ
+const formatVND = (value: string) => {
+  if (!value) return "";
+  return Number(value.replace(/\D/g, "")).toLocaleString("vi-VN");
+};
+
+// 👉 input tiền
+function MoneyInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) {
+  const handleChange = (e: any) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    onChange(raw);
+  };
+
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={formatVND(value)}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="w-full border p-3 rounded mt-1 pr-10 focus:ring-2 focus:ring-red-400 outline-none"
+      />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+        ₫
+      </span>
+    </div>
+  );
+}
+
 export default function CreateProductForm() {
   const [form, setForm] = useState({
     code: generateCode(),
     rank: "Đồng",
-    heroes_count: 0,
-    skins_count: 0,
-    price: 0,
-    fake_price: 0,
+    price: "",
+    fake_price: "",
     is_sale: false,
     is_active: true,
     highlight: "",
@@ -45,22 +80,7 @@ export default function CreateProductForm() {
   const [preview, setPreview] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // 👉 handle input
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : name.includes("count") || name.includes("price")
-          ? Number(value)
-          : value,
-    }));
-  };
-
-  // 👉 chọn nhiều ảnh
+  // 👉 chọn ảnh
   const handleSelectImages = (e: any) => {
     const selected = Array.from(e.target.files);
 
@@ -92,74 +112,69 @@ export default function CreateProductForm() {
   };
 
   // 👉 submit
- const handleSubmit = async (e: any) => {
-  e.preventDefault();
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-  // ❌ VALIDATE
-  if (
-    !form.rank ||
-    form.price <= 0 ||
-    form.fake_price <= 0 ||
-    form.heroes_count <= 0 ||
-    form.skins_count <= 0 ||
-    !form.category_id ||
-    files.length === 0
-  ) {
-    toast.error("Thiếu thông tin ⚠️", {
-      description: "Nhập đầy đủ + chọn ảnh giúp t 😏",
-    });
-    return;
-  }
+    if (
+      !form.rank ||
+      Number(form.price) <= 0 ||
+      Number(form.fake_price) <= 0 ||
+      !form.category_id ||
+      files.length === 0
+    ) {
+      toast.error("Thiếu thông tin ⚠️", {
+        description: "Nhập đầy đủ + chọn ảnh giúp t 😏",
+      });
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const imageUrls = await Promise.all(
-      files.map((file) => uploadImage(file))
-    );
+      const imageUrls = await Promise.all(
+        files.map((file) => uploadImage(file))
+      );
 
-    await addDoc(collection(db, "accounts"), {
-      ...form,
-      images: imageUrls,
-      category: categoryMap[
-        form.category_id as keyof typeof categoryMap
-      ],
-      quantity: 1,
-      created_at: new Date(),
-    });
+      await addDoc(collection(db, "accounts"), {
+        ...form,
+        price: Number(form.price),
+        fake_price: Number(form.fake_price),
+        images: imageUrls,
+        category:
+          categoryMap[
+            form.category_id as keyof typeof categoryMap
+          ],
+        quantity: 1,
+        created_at: new Date(),
+      });
 
-    // ✅ SUCCESS
-    toast.success("Đăng thành công 🚀", {
-      description: "Acc đã lên kệ, chuẩn bị bán thôi 🔥",
-    });
+      toast.success("Đăng thành công 🚀", {
+        description: "Acc đã lên kệ, chuẩn bị bán thôi 🔥",
+      });
 
-    // reset
-    setPreview([]);
-    setFiles([]);
-    setForm({
-      code: generateCode(),
-      rank: "Đồng",
-      heroes_count: 0,
-      skins_count: 0,
-      price: 0,
-      fake_price: 0,
-      is_sale: false,
-      is_active: true,
-      highlight: "",
-      category_id: "vip",
-    });
+      // reset
+      setPreview([]);
+      setFiles([]);
+      setForm({
+        code: generateCode(),
+        rank: "Đồng",
+        price: "",
+        fake_price: "",
+        is_sale: false,
+        is_active: true,
+        highlight: "",
+        category_id: "vip",
+      });
+    } catch (err) {
+      console.log(err);
 
-  } catch (err) {
-    console.log(err);
-
-    // ❌ ERROR
-    toast.error("Lỗi upload ❌", {
-      description: "Check lại mạng hoặc Cloudinary",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.error("Lỗi upload ❌", {
+        description: "Check lại mạng hoặc Cloudinary",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form
@@ -170,11 +185,15 @@ export default function CreateProductForm() {
 
       {/* RANK */}
       <div>
-        <label className="font-semibold">Rank</label>
+        <label className="text-sm font-semibold text-gray-700">
+          Rank
+        </label>
         <select
           name="rank"
           value={form.rank}
-          onChange={handleChange}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, rank: e.target.value }))
+          }
           className="w-full border p-3 rounded mt-1"
         >
           {ranks.map((r) => (
@@ -183,95 +202,142 @@ export default function CreateProductForm() {
         </select>
       </div>
 
-      {/* HERO + SKIN */}
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="number"
-          name="heroes_count"
-          value={form.heroes_count}
-          placeholder="Số tướng"
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
-        <input
-          type="number"
-          name="skins_count"
-          value={form.skins_count}
-          placeholder="Số skin"
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
-      </div>
-
       {/* PRICE */}
       <div className="grid grid-cols-2 gap-4">
-        <input
-          type="number"
-          name="price"
-          value={form.price}
-          placeholder="Giá thật"
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
-        <input
-          type="number"
-          name="fake_price"
-          value={form.fake_price}
-          placeholder="Giá fake"
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+        <div>
+          <label className="text-sm font-semibold text-gray-700">
+            Giá thật
+          </label>
+          <MoneyInput
+            value={form.price}
+            onChange={(val) =>
+              setForm((prev) => ({ ...prev, price: val }))
+            }
+            placeholder="Nhập giá..."
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold text-gray-700">
+            Giá fake
+          </label>
+          <MoneyInput
+            value={form.fake_price}
+            onChange={(val) =>
+              setForm((prev) => ({
+                ...prev,
+                fake_price: val,
+              }))
+            }
+            placeholder="Nhập giá..."
+          />
+        </div>
       </div>
 
       {/* CATEGORY */}
-      <select
-        name="category_id"
-        value={form.category_id}
-        onChange={handleChange}
-        className="w-full border p-3 rounded"
-      >
-        <option value="vip">Acc VIP</option>
-        <option value="white">Trắng Thông Tin</option>
-        <option value="info">Có Thông Tin</option>
-      </select>
+      <div>
+        <label className="text-sm font-semibold text-gray-700">
+          Loại acc
+        </label>
+        <select
+          name="category_id"
+          value={form.category_id}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              category_id: e.target.value,
+            }))
+          }
+          className="w-full border p-3 rounded mt-1"
+        >
+          <option value="vip">Acc VIP</option>
+          <option value="white">Trắng Thông Tin</option>
+          <option value="info">Có Thông Tin</option>
+        </select>
+      </div>
 
       {/* HIGHLIGHT */}
-      <input
-        name="highlight"
-        value={form.highlight}
-        placeholder="Highlight (Hot, VIP...)"
-        onChange={handleChange}
-        className="w-full border p-3 rounded"
-      />
+      <div>
+        <label className="text-sm font-semibold text-gray-700">
+          Highlight
+        </label>
+        <input
+          value={form.highlight}
+          placeholder="VD: VIP, Full skin..."
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              highlight: e.target.value,
+            }))
+          }
+          className="w-full border p-3 rounded mt-1"
+        />
+      </div>
 
       {/* TOGGLE */}
-      <div className="flex gap-6">
-        {/* sale */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            name="is_sale"
-            checked={form.is_sale}
-            onChange={handleChange}
-          />
-          Flash Sale
-        </label>
+      <div className="flex flex-wrap gap-4">
+        {/* SALE */}
+        <div className="flex items-center justify-between bg-red-50 px-4 py-2 rounded-xl w-full sm:w-auto">
+          <span className="text-sm font-medium text-red-600">
+            🔥 Flash Sale
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              setForm((prev) => ({
+                ...prev,
+                is_sale: !prev.is_sale,
+              }))
+            }
+            className={`w-11 h-6 flex items-center rounded-full p-1 transition ${
+              form.is_sale ? "bg-red-500" : "bg-gray-300"
+            }`}
+          >
+            <div
+              className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
+                form.is_sale ? "translate-x-5" : ""
+              }`}
+            />
+          </button>
+        </div>
 
-        {/* active */}
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            name="is_active"
-            checked={form.is_active}
-            onChange={handleChange}
-          />
-          Hiển thị
-        </label>
+        {/* ACTIVE */}
+        <div className="flex items-center justify-between bg-green-50 px-4 py-2 rounded-xl w-full sm:w-auto">
+          <span className="text-sm font-medium text-green-600">
+            👁 Hiển thị
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              setForm((prev) => ({
+                ...prev,
+                is_active: !prev.is_active,
+              }))
+            }
+            className={`w-11 h-6 flex items-center rounded-full p-1 transition ${
+              form.is_active ? "bg-green-500" : "bg-gray-300"
+            }`}
+          >
+            <div
+              className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
+                form.is_active ? "translate-x-5" : ""
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* IMAGE */}
       <div>
-        <input type="file" multiple onChange={handleSelectImages} />
+        <label className="text-sm font-semibold text-gray-700">
+          Ảnh sản phẩm
+        </label>
+        <input
+          type="file"
+          multiple
+          onChange={handleSelectImages}
+          className="mt-1"
+        />
       </div>
 
       {/* PREVIEW */}
@@ -280,7 +346,7 @@ export default function CreateProductForm() {
           <img
             key={i}
             src={img}
-            className="w-20 h-20 object-cover rounded"
+            className="w-20 h-20 object-cover rounded border"
           />
         ))}
       </div>
@@ -288,7 +354,7 @@ export default function CreateProductForm() {
       {/* BUTTON */}
       <button
         disabled={loading}
-        className="w-full bg-red-500 text-white py-3 rounded"
+        className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded font-semibold transition"
       >
         {loading ? "Đang upload..." : "Đăng sản phẩm"}
       </button>

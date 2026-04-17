@@ -26,7 +26,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const isMaintenance = process.env.MAINTENANCE_MODE
+  const isMaintenance = process.env.MAINTENANCE_MODE === "false";
 
   return (
     <html lang="vi" className="scroll-smooth">

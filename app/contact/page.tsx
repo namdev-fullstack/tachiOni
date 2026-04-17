@@ -14,13 +14,13 @@ export default function ContactPage() {
   const contacts = [
     {
       title: "Gọi ngay",
-      desc: "0966.216.495 ⚡",
+      desc: "0966 - 216 - 495 ⚡",
       icon: <Phone className="w-6 h-6" />,
       color: "from-green-400 to-green-600",
     },
     {
       title: "Zalo",
-      desc: "Chat nhanh - gửi acc liền",
+      desc: "0966 - 216 - 495",
       icon: <MessageCircle className="w-6 h-6" />,
       href: "https://zalo.me/0966216495",
       color: "from-blue-400 to-blue-600",

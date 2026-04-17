@@ -38,6 +38,7 @@ import { addPrice, getDeposit } from "@/lib/utils";
 // 🔥 Firebase
 import { db } from "@/lib/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
+import ProductDialog from "@/components/ProductDialog";
 
 function formatPrice(num: number) {
   return num.toLocaleString("vi-VN") + "₫";
@@ -197,63 +198,65 @@ export default function ProductsPage() {
       <h1 className="text-2xl font-bold">Danh sách sản phẩm</h1>
 
       {/* SEARCH + FILTER */}
-     <div className="flex flex-col md:flex-row gap-3 md:items-end">
+      <div className="flex flex-col md:flex-row gap-3 md:items-end">
 
-  {/* SEARCH */}
-  <div className="w-full md:w-1/3 space-y-1">
-    <span className="text-xs font-semibold text-gray-500">
-      Tìm kiếm
-    </span>
-    <div className="relative">
-      <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-      <Input
-        placeholder="Nhập mã acc..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="pl-10"
-      />
-    </div>
-  </div>
+        {/* SEARCH */}
+        <div className="w-full md:w-1/3 space-y-1">
+          <span className="text-xs font-semibold text-gray-500">
+            Tìm kiếm
+          </span>
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Nhập mã acc..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
 
-  {/* CATEGORY */}
-  <div className="space-y-1 w-full md:w-56">
-    <span className="text-xs font-semibold text-gray-500">
-      Loại acc
-    </span>
-    <Select onValueChange={setSelectedCategory} defaultValue="all">
-      <SelectTrigger>
-        <SelectValue placeholder="Chọn loại" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">Tất cả</SelectItem>
-        {categories.map((c) => (
-          <SelectItem key={c.id} value={c.id}>
-            {c.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
+        {/* CATEGORY */}
+        <div className="space-y-1 w-full md:w-56">
+          <span className="text-xs font-semibold text-gray-500">
+            Loại acc
+          </span>
+          <Select onValueChange={setSelectedCategory} defaultValue="all">
+            <SelectTrigger>
+              <SelectValue placeholder="Chọn loại" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-  {/* PRICE */}
-  <div className="space-y-1 w-full md:w-56">
-    <span className="text-xs font-semibold text-gray-500">
-      Khoảng giá
-    </span>
-    <Select onValueChange={setPriceRange} defaultValue="all">
-      <SelectTrigger>
-        <SelectValue placeholder="Chọn giá" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="0-500000">Dưới 500K</SelectItem>
-        <SelectItem value="500000-1500000">500K - 1.5 Triệu</SelectItem>
-        <SelectItem value="1500000-3500000">1.5 Triệu - 3.5 Triệu</SelectItem>
-        <SelectItem value="3500000">Trên 3.5 Triệu</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+        {/* PRICE */}
+        <div className="space-y-1 w-full md:w-56">
+          <span className="text-xs font-semibold text-gray-500">
+            Khoảng giá
+          </span>
+          <Select onValueChange={setPriceRange} defaultValue="all">
+            <SelectTrigger>
+              <SelectValue placeholder="Chọn giá" />
+            </SelectTrigger>
+            <SelectContent>
 
-</div>
+             <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="0-500000">Dưới 500K</SelectItem>
+              <SelectItem value="500000-1500000">500K - 1.5 Triệu</SelectItem>
+              <SelectItem value="1500000-3500000">1.5 Triệu - 3.5 Triệu</SelectItem>
+              <SelectItem value="3500000">Trên 3.5 Triệu</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+      </div>
 
       {/* GRID */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -268,98 +271,89 @@ export default function ProductsPage() {
               className="cursor-pointer hover:scale-105 transition duration-300"
             >
               <CardContent className="p-0">
-                             {/* IMAGE */}
-                             <div className="relative overflow-hidden rounded-t-lg">
-                               <Image
-                                 src={item.images?.[0] || "/acc.jpg"}
-                                 alt={item.code}
-                                 width={400}
-                                 height={200}
-                                 className="w-full h-32 sm:h-40 object-cover group-hover:scale-110 group-hover:-rotate-1 transition-transform duration-700"
-                               />
-             
-                               <Badge className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] border-0 animate-pulse shadow-md">
-                                 Sale
-                               </Badge>
-             
-                               <div className="absolute bottom-0 left-0">
-                                 <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold text-[10px] px-2 py-0.5 rounded-tr-lg shadow-md">
-                                   {item.categories?.name}
-                                 </div>
-                               </div>
-                             </div>
-             
-                             {/* CONTENT */}
-                             <div className="p-3 sm:p-4">
-                               <h3 className="text-sm sm:text-base font-bold mb-1 line-clamp-1">
-                                 Mã:{item.code}    
-                               </h3>
-             
-                               <div className="flex items-center space-x-1 mb-3">
-                                 <Trophy className="w-3 h-3 text-yellow-500" />
-                                 <span className="text-xs sm:text-sm font-medium text-gray-700">
-                                   Rank: {item.rank}
-                                 </span>
-                               </div>
-             
-                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-                                 <div className="flex items-center space-x-2 bg-blue-50 px-1.5 py-1 rounded-md shadow-sm">
-                                   <Users className="w-3 h-3 text-blue-500" />
-                                   <span className="text-[11px] font-bold">
-                                     {item.heroes_count} Tướng
-                                   </span>
-                                 </div>
-             
-                                 <div className="flex items-center space-x-1 bg-pink-50 px-1.5 py-1 rounded-md shadow-sm">
-                                   <Star className="w-3 h-3 text-pink-500" />
-                                   <span className="text-[11px] font-bold">
-                                     {item.skins_count} Skin
-                                   </span>
-                                 </div>
-                               </div>
-             
-                               <div className="mb-3">
-                                 <div className="flex items-center space-x-1 mb-1">
-                                   <span className="md:text-lg text-xs font-bold text-red-500">
-                                     {formatPrice(
-                                       Number(item.price) +
-                                         addPrice(Number(item.price))
-                                     )}
-                                   </span>
-                                 </div>
-             
-                                 <p className="text-[11px] text-green-600 font-medium">
-                                   Tiết kiệm{" "}
-                                   {formatPrice(
-                                     Number(item.fake_price) -
-                                       (Number(item.price) +
-                                         addPrice(Number(item.price)))
-                                   )}
-                                 </p>
-             
-                                 <div className="flex items-center gap-2 text-red-600 font-semibold text-xs bg-red-50 px-2 py-1 rounded-md w-fit mt-2">
-                                   <WalletMinimal className="w-3 h-3" />
-                                   Cọc:{" "}
-                                   {formatPrice(getDeposit(Number(item.price)))}
-                                 </div>
-                               </div>
-             
-                               <div className="hidden md:flex items-center justify-between">
-                                 <div className="flex">
-                                   {[...Array(5)].map((_, i) => (
-                                     <Star
-                                       key={i}
-                                       className="w-3 h-3 fill-yellow-400 text-yellow-400"
-                                     />
-                                   ))}
-                                 </div>
-             
-                                 <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[11px] px-2 py-1">
-                                   Mua <ChevronRight className="w-3 h-3 ml-1" />
-                                 </Button>
-                               </div>
-                             </div>
-                           </CardContent>
+                {/* IMAGE */}
+                <div className="relative overflow-hidden rounded-t-lg">
+                  <Image
+                    src={item.images?.[0] || "/acc.jpg"}
+                    alt={item.code}
+                    width={400}
+                    height={400}
+                    quality={100}
+                    className="w-full h-32 sm:h-56 object-cover object-top 
+  group-hover:scale-110 group-hover:-rotate-1 transition-transform duration-700"
+                  />
+
+                  <Badge className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] border-0 animate-pulse shadow-md">
+                    Sale
+                  </Badge>
+
+                  <div className="absolute bottom-0 left-0">
+                    <div className="relative bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold text-[10px] px-2 py-0.5 rounded-tr-lg shadow-md">
+                      {item.categories?.name}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CONTENT */}
+                <div className="p-3 sm:p-4">
+                  <h3 className="text-sm sm:text-base font-bold mb-1 line-clamp-1">
+                    Mã:{item.code}
+                  </h3>
+
+                  <div className="flex items-center space-x-1 mb-3">
+                    <Trophy className="w-3 h-3 text-yellow-500" />
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">
+                      Rank: {item.rank}
+                    </span>
+                  </div>
+
+
+
+                  <div className="mb-3">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="md:text-lg text-xs font-bold text-red-500">
+                        {formatPrice(
+                          Number(item.price)
+                        )}
+                      </span>
+                       <span className="md:text-base text-xs line-through text-gray-400">
+                                              {formatPrice(
+                                                Number(item.fake_price)
+                                              )}
+                                            </span>
+                    </div>
+
+                    <p className="text-[11px] text-green-600 font-medium">
+                      Tiết kiệm{" "}
+                      {formatPrice(
+                        Number(item.fake_price) -
+                        Number(item.price)
+                      )}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-red-600 font-semibold text-xs bg-red-50 px-2 py-1 rounded-md w-fit mt-2">
+                      <WalletMinimal className="w-3 h-3" />
+                      Cọc:{" "}
+                      {formatPrice(getDeposit(Number(item.price)))}
+                    </div>
+                  </div>
+
+                  <div className="hidden md:flex items-center justify-between">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                        />
+                      ))}
+                    </div>
+
+                    <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[11px] px-2 py-1">
+                      Mua <ChevronRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           ))
         ) : (
@@ -402,85 +396,7 @@ export default function ProductsPage() {
           </Button>
         </div>
       )}
-      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
-  <DialogContent className="max-w-3xl p-0 overflow-hidden">
-    {selectedProduct && (
-      <div className="relative">
-        {/* IMAGE */}
-        <div className="overflow-hidden">
-          <Image
-            src={selectedProduct.images?.[0] || "/acc.jpg"}
-            alt={selectedProduct.code}
-            width={800}
-            height={500}
-            className="w-full h-[400px] object-cover 
-              hover:scale-110 transition-transform duration-700 cursor-zoom-in"
-          />
-        </div>
-
-        {/* INFO */}
-       <div className="p-5 space-y-4">
-  {/* TITLE */}
-  <div className="flex items-center justify-between flex-wrap gap-2">
-    <h2 className="text-lg md:text-xl font-bold text-gray-800">
-      Mã: {selectedProduct.code}
-    </h2>
-
-    <span className="text-xs md:text-sm bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-semibold">
-      {selectedProduct.rank}
-    </span>
-  </div>
-
-  {/* STATS */}
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-    <div className="bg-blue-50 rounded-lg px-3 py-2 text-center shadow-sm">
-      <p className="text-[11px] text-gray-500">Tướng</p>
-      <p className="font-bold text-blue-600">
-        {selectedProduct.heroes_count || "Trong ảnh"}
-      </p>
-    </div>
-
-    <div className="bg-pink-50 rounded-lg px-3 py-2 text-center shadow-sm">
-      <p className="text-[11px] text-gray-500">Skin</p>
-      <p className="font-bold text-pink-600">
-        {selectedProduct.skins_count || "Trong ảnh"}
-      </p>
-    </div>
-
-    <div className="bg-purple-50 rounded-lg px-3 py-2 text-center shadow-sm col-span-2 md:col-span-1">
-      <p className="text-[11px] text-gray-500">Trạng thái</p>
-      <p className="font-bold text-purple-600">
-        {selectedProduct.is_sale ? "🔥 Đang sale" : "Còn Acc"}
-      </p>
-    </div>
-  </div>
-
-  {/* PRICE */}
-  <div className="bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-xl shadow-sm">
-    <div className="flex items-center justify-between flex-wrap gap-2">
-      <div>
-        <p className="text-[11px] text-gray-500">Giá bán</p>
-        <p className="text-lg md:text-xl font-bold text-red-500">
-          {formatPrice(
-            Number(selectedProduct.price) +
-            addPrice(Number(selectedProduct.price))
-          )}
-        </p>
-      </div>
-
-      <div className="text-right">
-        <p className="text-[11px] text-gray-500">Cọc trước</p>
-        <p className="text-sm md:text-base font-semibold text-green-600">
-          {formatPrice(getDeposit(Number(selectedProduct.price)))}
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-      </div>
-    )}
-  </DialogContent>
-</Dialog>
+      <ProductDialog selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} />
     </div>
   );
 }
