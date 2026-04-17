@@ -127,7 +127,7 @@ export default function Header() {
               </Link>
 
               <div className="border-t border-gray-200/50 pt-4 flex flex-col space-y-3">
-                <DepositButton />
+                {/* <DepositButton /> */}
 
 
               </div>
